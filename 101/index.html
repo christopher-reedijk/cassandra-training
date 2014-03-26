@@ -4,10 +4,10 @@
 	<head>
 		<meta charset="utf-8">
 
-		<title>reveal.js - The HTML Presentation Framework</title>
+		<title>C* 101: Cassandra and Modelling Basics</title>
 
-		<meta name="description" content="A framework for easily creating beautiful presentations using HTML">
-		<meta name="author" content="Hakim El Hattab">
+		<meta name="description" content="A presentation to give insight into the basics of C* and data modelling">
+		<meta name="author" content="Christopher Reedijk | Gary Stewart">
 
 		<meta name="apple-mobile-web-app-capable" content="yes" />
 		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -15,8 +15,8 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
 		<link rel="stylesheet" href="css/reveal.min.css">
-		<link rel="stylesheet" href="css/theme/default.css" id="theme">
-
+		<link rel="stylesheet" href="css/theme/night.css" id="theme">
+		
 		<!-- For syntax highlighting -->
 		<link rel="stylesheet" href="lib/css/zenburn.css">
 
@@ -28,6 +28,24 @@
 		<!--[if lt IE 9]>
 		<script src="lib/js/html5shiv.js"></script>
 		<![endif]-->
+		<style type="text/css">
+        .ING {
+        	color: #ff6600;
+        }
+        .ING_DARK_BLUE {
+        	color: #000066;
+        }
+        .ING_LIGHT_BLUE {
+        	color: #B4C3E1;
+        }
+        .ING_GREY {
+        	color: #969696;
+        }
+        .ING_DARK_GREY {
+        	color: #5F5F5F;
+        }
+    </style>
+    <link rel="shortcut icon" href="./images/ing_nl_favicon.ico">
 	</head>
 
 	<body>
@@ -36,353 +54,667 @@
 
 			<!-- Any section element inside of this container is displayed as a slide -->
 			<div class="slides">
-				<section>
-					<h1>Reveal.js</h1>
-					<h3>HTML Presentations Made Easy</h3>
-					<p>
-						<small>Created by <a href="http://hakim.se">Hakim El Hattab</a> / <a href="http://twitter.com/hakimel">@hakimel</a></small>
-					</p>
-				</section>
-
-				<section>
-					<h2>Heads Up</h2>
-					<p>
-						reveal.js is a framework for easily creating beautiful presentations using HTML. You'll need a browser with
-						support for CSS 3D transforms to see it in its full glory.
-					</p>
-
-					<aside class="notes">
-						Oh hey, these are some notes. They'll be hidden in your presentation, but you can see them if you open the speaker notes window (hit 's' on your keyboard).
-					</aside>
-				</section>
-
-				<!-- Example of nested vertical slides -->
-				<section>
+				<section>				
 					<section>
-						<h2>Vertical Slides</h2>
+						<h1><scan class="ING">C* 101</scan></h1>					
+						<h3>Cassandra and Modeling Basics</h3>
 						<p>
-							Slides can be nested inside of other slides,
-							try pressing <a href="#" class="navigate-down">down</a>.
+							<!--<small>Created by Christopher Reedijk (<a href="http://twitter.com/creedijk"><span class="ING">@creedijk</span></a>) and Gary Stewart (<a href="http://twitter.com/Gaz_GandA"><span class="ING">@Gaz_GandA</span></a>)<br>Dev Engineers, ING Netherlands</small><br>-->
+							<pre>
+	SELECT * FROM presenters WHERE name IN ('Christopher Reedijk', 'Gary Stewart');
+	 name                | title        | company | area | twitter    
+	---------------------+--------------+---------+------+----------- 
+	 Christopher Reedijk | Dev Engineer | ING     | NL   | <a href="http://twitter.com/creedijk"><span class="ING">@creedijk</span></a>
+	 Gary Stewart        | Dev Engineer | ING     | NL   | <a href="http://twitter.com/Gaz_GandA"><span class="ING">@Gaz_GandA</span></a>
+	 						</pre>
+							<br><img width=10% src="./images/ing_nl.jpg" alt="ING">
+							<br><small>ING Nederland (<a href="http://twitter.com/@ingnl"><span class="ING">@ingnl</span></a>)</small>
+							<br><br><br><small>This presentation is based on a 101 presentation by<br>Hayato Shimizu (<a href="https://twitter.com/hayato_shimizu"><span class="ING">@hayato_shimizu</span></a>)</small>
 						</p>
-						<a href="#" class="image navigate-down">
-							<img width="178" height="238" src="https://s3.amazonaws.com/hakim-static/reveal-js/arrow.png" alt="Down arrow">
-						</a>
+					</section>				
+					<section>
+						<p><span class="ING">Short introduction</span></p>
+						<table width=100%>
+							<tr>
+								<td style="margin-left:auto;margin-right:auto" width=50%><img width="320" height="320" src="./images/chris.jpg" alt="Chris"></td>
+								<td style="margin-left:auto;margin-right:auto" width=50%><img width="320" height="320" src="./images/gary.jpg" alt="Gary"></td>
+							</tr>
+							<tr>
+								<td width=50%>Christopher Reedijk</td>
+								<td width=50%>Gary Stewart</td>
+							</tr>
+							<tr>
+								<td width=50%>
+									<ul>
+										<li class="ING">Dev Engineer</li>
+										<li class="ING">C* enthusiast</li>
+										<li class="ING">@ING since: 01-01-2011</li>
+										<li class="ING">AKA Grumpy</li>
+									</ul>
+								</td>
+								<td width=50%>
+									<ul>
+										<li class="ING">Dev Engineer</li>
+										<li class="ING">Love/hate relationship with C* :)</li>
+										<li class="ING">@ING since: 01-01-2012</li>
+										<li class="ING">AKA Legacy</li>
+									</ul>
+								</td>
+							</tr>
+						</table>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2><span class="ING">Apache Cassandra</span></h2>
+						<br>
+						<p>Created by Avinash Lakshman and Prashant Malik at Facebook</p>
+						<br>
+						<table width=100%>
+							<tr>
+								<th class="ING" width=45%>Cassandra is</th>
+								<th class="ING" width=10%></th>
+								<th class="ING" width=45%>Cassandra is not</th>
+							</tr>
+							<tr>
+								<td width=50% style="vertical-align:top">
+									<ul>
+										<li>A distributed database</li>
+										<li>Highly scalable</li>
+										<li>Fault tolerant</li>
+										<li>Consistency is tunable</li>
+										<li>High throughput</li>
+										<li>Network topology aware</li>
+										<li>Multi-DC Active-Active</li>
+										<li>Written in Java</li>
+										<li>A column family</li>
+										<li>CQL3</li>
+									</ul>
+								</td>
+								<td width=10%>&nbsp;</td>
+								<td width=50% style="vertical-align:top">
+									<ul>
+										<li>ACID compliant database</li>
+										<li>A relational database</li>
+										<li>ANSI SQL compliant</li>
+										<li>A document database</li>
+									</ul>
+								</td>
+							</tr>
+						</table>
+					</section>
+				</section>
+				<section>
+					<h2><span class="ING">DataStax and Cassandra</span></h2>
+					<img width=25% src="./images/cassandra.png" alt="Cassandra" style="background-color:white;">
+					<p>Founded in 2010 by Jonathan Ellis and Matt Pfeil</p>
+					<p>80% Apache Cassandra code contribution</p>
+					<p>Offer commercial support for DataStax Enterprise version of Cassandra</p>
+					<p>DataStax Enterprise integrates Search and Analytics</p>
+					<p>Head Quarter in San Francisco Bay area</p>
+					<p>EMEA office opened in March 2013</p>
+				</section>	
+				<section>
+					<section>
+						<h1><span class="ING">Cassandra Basics</span></h1>
 					</section>
 					<section>
-						<h2>Basement Level 1</h2>
-						<p>Press down or up to navigate.</p>
+						<h2><span class="ING">Network Topology Awareness</span></h2>
+						<table>
+							<tr>
+								<td rowspan="2" width=80% style="vertical-align:middle">
+									<img width=100% src="./images/network_topology_awareness.png" alt="Network Topology Awareness" style="background-color:white;"></img>
+								</td>
+							</tr>
+							<tr>
+								<td width=20% style="vertical-align:top">
+									<u>Writes</u><br>
+									<ul>
+										<small><li>Any</li>
+										<li>One</li>
+										<li>Quorum</li>
+										<li>Local_Quorum</li>
+										<li>Each_Quorum</li>
+										<li>All</li></small>
+									</ul>
+								</td>
+								<td width=20% style="vertical-align:top">
+									<u>Reads</u><br>
+									<ul>
+										<small><li>One</li>
+										<li>Quorum</li>
+										<li>Local_Quorum</li>
+										<li>Each_Quorum</li>
+										<li>All</li></small>
+									</ul>
+								</td>
+							</tr>
+						</table>
 					</section>
 					<section>
-						<h2>Basement Level 2</h2>
-						<p>Cornify</p>
-						<a class="test" href="http://cornify.com">
-							<img width="280" height="326" src="https://s3.amazonaws.com/hakim-static/reveal-js/cornify.gif" alt="Unicorn">
-						</a>
+						<h2><span class="ING">Cassandra Replication Strategy</span></h2>
+						<table>
+							<tr>
+								<td width=60% style="vertical-align:middle">
+									<p>Token Range 0 -> 2<small>127</small>-1 in Ring Formation</p>
+									<p>Consistent Hashing Algorithm</p>
+									<p>Replica nodes in clockwise</p>
+									<p>Gossip protocol between nodes</p>
+								</td>
+								<td width=40% style="vertical-align:middle">
+									<img width=100% src="./images/cassandra_replication_strategy.png" alt="Cassandra Replication Strategy" style="background-color:white;"></img>
+									<small>RF = 3</small>
+								</td>
+							</tr>
+						</table>
 					</section>
 					<section>
-						<h2>Basement Level 3</h2>
-						<p>That's it, time to go back up.</p>
-						<a href="#/2" class="image">
-							<img width="178" height="238" src="https://s3.amazonaws.com/hakim-static/reveal-js/arrow.png" alt="Up arrow" style="-webkit-transform: rotate(180deg);">
-						</a>
-					</section>
-				</section>
-
-				<section>
-					<h2>Slides</h2>
-					<p>
-						Not a coder? No problem. There's a fully-featured visual editor for authoring these, try it out at <a href="http://slid.es" target="_blank">http://slid.es</a>.
-					</p>
-				</section>
-
-				<section>
-					<h2>Point of View</h2>
-					<p>
-						Press <strong>ESC</strong> to enter the slide overview.
-					</p>
-					<p>
-						Hold down alt and click on any element to zoom in on it using <a href="http://lab.hakim.se/zoom-js">zoom.js</a>. Alt + click anywhere to zoom back out.
-					</p>
-				</section>
-
-				<section>
-					<h2>Works in Mobile Safari</h2>
-					<p>
-						Try it out! You can swipe through the slides and pinch your way to the overview.
-					</p>
-				</section>
-
-				<section>
-					<h2>Marvelous Unordered List</h2>
-					<ul>
-						<li>No order here</li>
-						<li>Or here</li>
-						<li>Or here</li>
-						<li>Or here</li>
-					</ul>
-				</section>
-
-				<section>
-					<h2>Fantastic Ordered List</h2>
-					<ol>
-						<li>One is smaller than...</li>
-						<li>Two is smaller than...</li>
-						<li>Three!</li>
-					</ol>
-				</section>
-
-				<section data-markdown>
-					<script type="text/template">
-						## Markdown support
-
-						For those of you who like that sort of thing. Instructions and a bit more info available [here](https://github.com/hakimel/reveal.js#markdown).
-
-						```
-						<section data-markdown>
-						  ## Markdown support
-
-						  For those of you who like that sort of thing.
-						  Instructions and a bit more info available [here](https://github.com/hakimel/reveal.js#markdown).
-						</section>
-						```
-					</script>
-				</section>
-
-				<section id="transitions">
-					<h2>Transition Styles</h2>
-					<p>
-						You can select from different transitions, like: <br>
-						<a href="?transition=cube#/transitions">Cube</a> -
-						<a href="?transition=page#/transitions">Page</a> -
-						<a href="?transition=concave#/transitions">Concave</a> -
-						<a href="?transition=zoom#/transitions">Zoom</a> -
-						<a href="?transition=linear#/transitions">Linear</a> -
-						<a href="?transition=fade#/transitions">Fade</a> -
-						<a href="?transition=none#/transitions">None</a> -
-						<a href="?#/transitions">Default</a>
-					</p>
-				</section>
-
-				<section id="themes">
-					<h2>Themes</h2>
-					<p>
-						Reveal.js comes with a few themes built in: <br>
-						<a href="?#/themes">Default</a> -
-						<a href="?theme=sky#/themes">Sky</a> -
-						<a href="?theme=beige#/themes">Beige</a> -
-						<a href="?theme=simple#/themes">Simple</a> -
-						<a href="?theme=serif#/themes">Serif</a> -
-						<a href="?theme=night#/themes">Night</a> <br>
-						<a href="?theme=moon#/themes">Moon</a> -
-						<a href="?theme=solarized#/themes">Solarized</a>
-					</p>
-					<p>
-						<small>
-							* Theme demos are loaded after the presentation which leads to flicker. In production you should load your theme in the <code>&lt;head&gt;</code> using a <code>&lt;link&gt;</code>.
-						</small>
-					</p>
-				</section>
-
-				<section>
-					<h2>Global State</h2>
-					<p>
-						Set <code>data-state="something"</code> on a slide and <code>"something"</code>
-						will be added as a class to the document element when the slide is open. This lets you
-						apply broader style changes, like switching the background.
-					</p>
-				</section>
-
-				<section data-state="customevent">
-					<h2>Custom Events</h2>
-					<p>
-						Additionally custom events can be triggered on a per slide basis by binding to the <code>data-state</code> name.
-					</p>
-					<pre><code data-trim contenteditable style="font-size: 18px; margin-top: 20px;">
-Reveal.addEventListener( 'customevent', function() {
-	console.log( '"customevent" has fired' );
-} );
-					</code></pre>
-				</section>
-
-				<section>
-					<section data-background="#007777">
-						<h2>Slide Backgrounds</h2>
-						<p>
-							Set <code>data-background="#007777"</code> on a slide to change the full page background to the given color. All CSS color formats are supported.
-						</p>
-						<a href="#" class="image navigate-down">
-							<img width="178" height="238" src="https://s3.amazonaws.com/hakim-static/reveal-js/arrow.png" alt="Down arrow">
-						</a>
-					</section>
-					<section data-background="https://s3.amazonaws.com/hakim-static/reveal-js/arrow.png">
-						<h2>Image Backgrounds</h2>
-						<pre><code>&lt;section data-background="image.png"&gt;</code></pre>
-					</section>
-					<section data-background="https://s3.amazonaws.com/hakim-static/reveal-js/arrow.png" data-background-repeat="repeat" data-background-size="100px">
-						<h2>Repeated Image Backgrounds</h2>
-						<pre><code style="word-wrap: break-word;">&lt;section data-background="image.png" data-background-repeat="repeat" data-background-size="100px"&gt;</code></pre>
-					</section>
-				</section>
-
-				<section data-transition="linear" data-background="#4d7e65" data-background-transition="slide">
-					<h2>Background Transitions</h2>
-					<p>
-						Pass reveal.js the <code>backgroundTransition: 'slide'</code> config argument to make backgrounds slide rather than fade.
-					</p>
-				</section>
-
-				<section data-transition="linear" data-background="#8c4738" data-background-transition="slide">
-					<h2>Background Transition Override</h2>
-					<p>
-						You can override background transitions per slide by using <code>data-background-transition="slide"</code>.
-					</p>
-				</section>
-
-				<section>
-					<h2>Clever Quotes</h2>
-					<p>
-						These guys come in two forms, inline: <q cite="http://searchservervirtualization.techtarget.com/definition/Our-Favorite-Technology-Quotations">
-						&ldquo;The nice thing about standards is that there are so many to choose from&rdquo;</q> and block:
-					</p>
-					<blockquote cite="http://searchservervirtualization.techtarget.com/definition/Our-Favorite-Technology-Quotations">
-						&ldquo;For years there has been a theory that millions of monkeys typing at random on millions of typewriters would
-						reproduce the entire works of Shakespeare. The Internet has proven this theory to be untrue.&rdquo;
-					</blockquote>
-				</section>
-
-				<section>
-					<h2>Pretty Code</h2>
-					<pre><code data-trim contenteditable>
-function linkify( selector ) {
-  if( supports3DTransforms ) {
-
-    var nodes = document.querySelectorAll( selector );
-
-    for( var i = 0, len = nodes.length; i &lt; len; i++ ) {
-      var node = nodes[i];
-
-      if( !node.className ) {
-        node.className += ' roll';
-      }
-    }
-  }
-}
-					</code></pre>
-					<p>Courtesy of <a href="http://softwaremaniacs.org/soft/highlight/en/description/">highlight.js</a>.</p>
-				</section>
-
-				<section>
-					<h2>Intergalactic Interconnections</h2>
-					<p>
-						You can link between slides internally,
-						<a href="#/2/3">like this</a>.
-					</p>
-				</section>
-
-				<section>
-					<section id="fragments">
-						<h2>Fragmented Views</h2>
-						<p>Hit the next arrow...</p>
-						<p class="fragment">... to step through ...</p>
-						<ol>
-							<li class="fragment"><code>any type</code></li>
-							<li class="fragment"><em>of view</em></li>
-							<li class="fragment"><strong>fragments</strong></li>
-						</ol>
-
-						<aside class="notes">
-							This slide has fragments which are also stepped through in the notes window.
-						</aside>
+						<h2><span class="ING">No Single Point of Failure</span></h2>
+						<table>
+							<tr>
+								<td width=50% style="vertical-align:middle">
+									<ul>
+										<li>Client Load Balances</li>
+										<li>Do not use a hardware LB</li>
+									</ul>
+								</td>
+								<td width=50% style="vertical-align:middle">
+									<img width=100% src="./images/no_spof.png" alt="No SPOF" style="background-color:white;"></img>
+								</td>
+							</tr>
+						</table>
 					</section>
 					<section>
-						<h2>Fragment Styles</h2>
-						<p>There's a few styles of fragments, like:</p>
-						<p class="fragment grow">grow</p>
-						<p class="fragment shrink">shrink</p>
-						<p class="fragment roll-in">roll-in</p>
-						<p class="fragment fade-out">fade-out</p>
-						<p class="fragment highlight-red">highlight-red</p>
-						<p class="fragment highlight-green">highlight-green</p>
-						<p class="fragment highlight-blue">highlight-blue</p>
-						<p class="fragment current-visible">current-visible</p>
-						<p class="fragment highlight-current-blue">highlight-current-blue</p>
+						<h2><span class="ING">Write Path</span></h2>
+						<img width=100% src="./images/write_path.png" alt="Write Path" style="background-color:white;"></img>
+					</section>
+					<section>
+						<h2><span class="ING">Read Path</span></h2>
+						<img width=100% src="./images/read_path.png" alt="Read Path" style="background-color:white;"></img>
+					</section>
+					<section>
+						<h2><span class="ING">Logical Grouping</span></h2>
+						<img width=70% src="./images/logical_grouping.png" alt="Logical Grouping" style="background-color:white;"></img>
+					</section>
+					<section>
+						<h2><span class="ING">Replication Factor and Data Consistency In a Distributed System</span></h2>
+						<p>CAP – Consistency, Availability, Partition Tolerance</p>
+						<p>Consistency is achieved with W + R > RF</p>
+						<p>Quorum = (Integer) RF / 2 + 1</p>
+						<img width=90% src="./images/quorum.png" style="background-color:white;"></img>
+					</section>
+				</section>			
+				<section>
+					<section>
+						<h1><span class="ING">CQL3</span></h1>	
+					</section>
+					<section>
+						<h2><span class="ING">Why CQL3?</span></h2>
+						<p>Excellent language for modeling data structures</p>
+						<p>Usability</p>
+						<p>Readability</p>
+						<p>Familiarity</p>
+						<p>Programming language agnostic</p>
+					</section>
+					<section>
+						<h2><span class="ING">Apache Thrift, Hector, Astyanax days</span></h2>
+						<table>
+							<tr>
+								<td width=50% style="vertical-align:middle">
+									<pre>
+Column col = new Column(ByteBuffer.wrap("product".getBytes())));
+col.setValue(ByteBuffer.wrap("phone".getBytes());
+col.setTimestamp(System.currentTimeMillis());
+
+ColumnOrSuperColumn c = new ColumnOrSuperColumn();
+c.setColumn(col);
+
+Mutation m = new Mutation();
+m.setColumn_or_supercolumn(c);
+
+List<Mutations> ms = new ArrayList<Mutation>();
+ms.add(m);
+
+Map<String, List<Mutations>> cf = new HashMap<String, List<Mutations>>();
+cf.put("products", m);
+
+Map<ByteBuffer, Map<String, List<Mutation>>> records = new HashMap<ByteBuffer, Map<String, List<Mutation>>>();
+records.put(ByteBuffer.wrap("key".getBytes()), cf);
+client.batch_mutate(records, consistencyLevel);
+									</pre>
+								</td>
+								<td width=50% style="vertical-align:middle">
+									<img width=100% src="./images/stress.png" style="background-color:white;"></img>
+								</td>
+							</tr>
+						</table>
+					</section>
+					<section>
+						<h2><span class="ING">CQL3</span></h2>
+						<br>
+						<pre>
+INSERT INTO products (product_id, product) VALUES (“id12321”, “phone”);
+						</pre>
+						<img width=60% src="./images/easy.png" style="background-color:white;"></img>
+					</section>
+					<section>
+						<h2><span class="ING">CQL Basics – creating a table</span></h2>
+						<br>
+						<table>
+							<tr>
+								<td width=35% style="vertical-align:top">
+									<pre>
+CREATE TABLE cities (
+    city_name   varchar,
+    elevation   int,
+    population  int,
+    latitude    float,
+    longitude   float,
+    PRIMARY KEY (city_name)
+);
+									</pre>
+								</td>
+								<td width=65% style="vertical-align:top">
+									<p>We can visualize it this way:</p>
+									<img width=100% src="./images/simple_table.png" style="background-color:white;"></img>
+									<p>city_name is the partition key</p>
+									<p>In this example, the partition key = primary key</p>
+								</td>
+							</tr>
+						</table>
+					</section>
+					<section>
+						<h2><span class="ING">CQL Basics – Composite<br>Primary Key</span></h2>
+						<br>
+						<div style="color:#ffffff">
+							<div align="left"><p><span style="color:#ff1493">The Primary Key</span></p></div>
+							<ul>
+								<li>The key uniquely identifies a row</li>
+								<li>A composite primary key consists of:</li>
+								<ul>
+									<li>A <span style="color:#7cfc00">partition key</span></li>
+									<li>One or more <span style="color:#E4F173">clustering columns</span><br>
+											e.g. <span style="color:#ff1493">PRIMARY KEY</span> (<span style="color:#7cfc00">partition key</span>, <span style="color:#E4F173">cluster columns</span>, ...)</li>
+								</ul>
+								<li>The <span style="color:#7cfc00">partition key</span> determines on which node the partition resides</li>
+								<li>Data is ordered in <span style="color:#E4F173">cluster column</span> order within the partition</li>
+							</ul>
+						</div>
+					</section>
+					<section>
+						<h2><span class="ING">CQL Basics – Composite<br>Primary Key</span></h2>
+						<br>
+						<table>
+							<tr>
+								<td width=45% style="vertical-align:top">
+									<pre>
+CREATE TABLE sporty_league (
+   team_name   varchar,
+   player_name varchar,
+   jersey      int,
+   PRIMARY KEY (team_name, player_name)
+);
+									</pre>
+								</td>
+								<td width=55% style="vertical-align:top">
+									<img width=100% src="./images/composite_table.png" style="background-color:white;"></img>
+								</td>
+							</tr>
+						</table>
+					</section>
+					<section>
+						<h2><span class="ING">CQL Basics – Simple Select</span></h2>
+						<pre>
+
+ SELECT * FROM sporty_league;
+						</pre>
+						<table width=100%>
+							<tr>
+								<td width=50% style="vertical-align:middle">
+									<img width=100% src="./images/simple_select.png" style="background-color:white;"></img>
+								</td>
+								<td width=50% style="vertical-align:middle">
+									<img width=100% src="./images/composite_table.png" style="background-color:white;"></img>
+								</td>
+							</tr>
+						</table>
+						<br><br>
+						<p>More than a few rows can be slow. (Limited to 10,000 rows by default)</p>
+						<p>Use LIMIT keyword to choose fewer or more rows</p>
+					</section>
+					<section>
+						<h2><span class="ING">CQL Basics - Simple Select on Partition Key and Cluster Columns</span></h2>
+						<pre>
+
+ SELECT * FROM sporty_league WHERE team_name = 'Mighty Mutts';
+						</pre>
+						<img width=60% src="./images/simple_select_cc1.png" style="background-color:white;"></img>
+						<pre>
+ SELECT * FROM sporty_league WHERE team_name = 'Mighty Mutts'
+ and player_name = 'Lucky';
+						</pre>
+						<img width=60% src="./images/simple_select_cc2.png" style="background-color:white;"></img>
+					</section>
+					<section>
+						<h2><span class="ING">CQL Basics – Insert/Update</span></h2>
+						<pre>
+
+INSERT INTO sporty_league (team_name, player_name, jersey)
+VALUES ('Mighty Mutts','Felix',90);
+						</pre>
+					</section>
+					<section>
+						<h2><span class="ING">CQL Basics - Ordering</span></h2>
+						<br>
+						<table>
+							<tr>
+								<td width=40% style="vertical-align:top">
+									<pre>
+SELECT * FROM sporty_league
+WHERE team_name = 'Mighty Mutts'
+ORDER BY player_name DESC;
+									</pre>
+								</td>
+								<td width=60% style="vertical-align:top">
+									<p>Partition keys are not ordered, but the cluster columns are</p>
+									<p>You can only order by a column if it's a cluster column</p>
+									<p>Data will by default be in the order of the clustering column(s)</p>
+									<p>You can also use the ORDER BY keyword – but only on the clustering column(s)!</p>
+								</td>
+							</tr>
+						</table>
+					</section>
+					<section>
+						<h2><span class="ING">CQL Basics – Composite<br>Partition Key</span></h2>
+						<br>
+						<table>
+							<tr>
+								<td width=40% style="vertical-align:top">
+									<pre>
+CREATE TABLE cities (
+  city_name   varchar,
+  state varchar, 
+  elevation float, 
+  latitude float, 
+  longitude float
+  population float,
+  PRIMARY KEY ((city_name,state))
+);
+									</pre>
+								</td>
+								<td width=60% style="vertical-align:top">
+									<img width=100% src="./images/composite_partition_key.png" style="background-color:white;"></img>
+									<p>Each city gets it own partition!</p>
+								</td>
+							</tr>
+						</table>
+					</section>
+					<section>
+						<h2><span class="ING">CQL Basics – Performance<br>considerations</span></h2>
+						<br>
+						<p>The best queries are in a single partition.</p>
+						<small>i.e. WHERE partition key = &lt;something&gt;</small>
+						<p>Queries that span multiple partitions are <span style="color:red">s-l-o-w</span></p>
+						<p>Queries that span multiple cluster columns are <span style="color:green">fast</span></p>
+					</section>
+					<section>
+						<h2><span class="ING">CQL Basics - Tracing</span></h2>
+						<br>
+						<p>You can turn on tracing on or off for queries with the TRACING ON | OFF command</p>
+						<p>This can help you understand what Cassandra is doing and identify any performance problems</p>
+						<img width=100% src="./images/tracing.png" style="background-color:white;"></img>
+						<p><a href="http://www.datastax.com/dev/blog/tracing-in-cassandra-1-2">http://www.datastax.com/dev/blog/tracing-in-cassandra-1-2</a></p>
+					</section>
+					<section>
+						<h2><span class="ING">CQL Basics - Time to Live (TTL)</span></h2>
+						<pre>
+
+INSERT INTO users (id, first, last)
+VALUES ('abc123', 'abe', 'lincoln')
+USING TTL 3600; // Expires data in one hour
+						</pre>
+					</section>
+					<section>
+						<h2><span class="ING">CQL Basics – Data Types</span></h2>
+						<img width=55% src="./images/data_types.png" style="background-color:white;"></img>
+					</section>
+					<section>
+						<h2><span class="ING">CQL Basics – Composite<br>Partition Key</span></h2>
+						<br>
+						<div align="left"><p>CQL supports having columns that contain collections of data</p>
+										<pre>
+The collection types include:           CREATE TABLE collections_example (
+Set, List and Map                           id int PRIMARY KEY,
+                                            set_example set&lt;text&gt;,
+(64K max limitation)                        list_example list&lt;text&gt;,
+                                            map_example map&lt;int, text&gt;
+                                        );
+										</pre>
+							<p>These data types are intended to support the type of 1-to-many relationships that can be modeled in a relational DB e.g. a user has many email addresses</p><br>
+							<p>Some performance considerations around collections</p>
+						</div>
+						<ul>
+							<li>Often more efficient to denormalise further rather than use collections if intending to store lots of data.</li>
+							<li>Favour sets over list – lists not very performant</li>
+						</ul>
+					</section>
+					<section>
+						<h2><span class="ING">CQL Basics - Lightweight Transactions</span></h2>
+						<p>Introduced in Cassandra 2.0</p>
+						<p>Example:</p>
+						<pre>
+INSERT INTO customer_account (customerID, customer_email)
+VALUES ('LauraS', 'lauras@gmail.com')
+IF NOT EXISTS;
+
+UPDATE customer_account SET customer_email='laurass@gmail.com'
+IF customer_email='lauras@gmail.com';
+						</pre>
+						<p>Great for 1% of your application – but not recommended to be used too much!</p>
+					</section>
+					<!--<section>
+						<h2><span class="ING">Lightweight Transactions - Paxos based</span></h2>
+						<br>
+						<table>
+							<tr>
+								<td width=60% style="vertical-align:top">
+									<ul>
+										<li>All operations are quorum-based</li>
+										<li>An elected leader prepares the participating replicas a ballot</li>
+										<li>Replicas would reply with the promise</li>
+										<li>Each replica sends information about unfinished operations to the leader during prepare</li>
+										<li>Paxos Made Simple</li>
+										<li>Paxos Made Live – An Engineering Perspective</li>
+									</ul>
+								</td>
+								<td width=40% style="vertical-align:top">
+									<img width=60% src="./images/paxos.png" style="background-color:white;"></img>
+								</td>
+							</tr>
+						</table>
+					</section>-->
+				</section>
+				<section>
+					<section>
+						<h1><span class="ING">Data Modeling</span></h1>	
+					</section>
+					<section>
+						<h2><span class="ING">Time Series</span></h2>
+						<br>
+						<table width=100%>
+							<tr>
+								<td width=55% style="vertical-align:top">
+									<pre class="fragment">
+CREATE TABLE sensor_data (
+  sensor_id int,
+  date varchar,
+  time timeuuid,
+  value int,
+  PRIMARY KEY( (sensor_id, date), time ) )
+WITH CLUSTERING ORDER BY (time DESC); 
+									</pre>
+								</td>
+								<td width=45% style="vertical-align:top">
+									<pre class="fragment">
+INSERT INTO sensor_data
+(sensor_id, date, time, value)
+VALUES (
+  1, '20130908',
+  1883-11e3-8ffd-0800200c9a66,
+  432)
+USING TTL 604800;
+									</pre>
+								</td>
+							</tr>
+							<tr>
+								<td colspan="2" style="vertical-align:top; margin-left:auto; margin-right:auto">
+									<pre class="fragment">
+SELECT time, value, TTL (value) FROM sensor_data
+  WHERE sensor_id = 1 AND date = '20130908'
+  AND time &gt; maxTimeuuid('2013-09-08 10:05+0000')
+  AND time &lt; minTimeuuid('2013-09-08 15:00+0000');
+									</pre>
+								</td>
+							</tr>
+							<tr>
+								<td colspan="2" style="vertical-align:top; margin-left:auto; margin-right:auto">
+									<pre class="fragment">
+ time                        | value | ttl(value)
+-----------------------------+-------+------------
+ 1883-11e3-8ffd-0800200c9a66 |   432 |     604257
+ 1887-11e3-8ffd-0800200c9a66 |   433 |     604452
+									</pre>
+								</td>
+							</tr>
+						</table>
+					</section>
+					<section>
+						<h2><span class="ING">De-normalize</span></h2>
+						<br>
+						<table width=100%>
+							<tr>
+								<th class="ING">Don't do this</th>
+								<th class="ING"></th>
+								<th class="fragment"><span class="ING">Do this instead</span></th>
+							</tr>
+							<tr>
+								<td width=45% style="vertical-align:top">
+									<pre>
+CREATE TABLE users (
+	id uuid PRIMARY KEY,
+	username text,
+	email text,
+	street_address text,
+	town text,
+);
+
+CREATE INDEX user_street ON users (street_address);
+CREATE INDEX user_town ON users (town);
+
+SELECT * FROM users WHERE
+	town = 'Stockholm' AND
+	street_address = 'Sankt Eriksgatan'
+	ALLOW FILTERING; 
+									</pre>
+								</td>
+								<td width=10% style="vertical-align:top">&nbsp;</td>
+								<td width=45% style="vertical-align:top">
+									<pre class="fragment">
+CREATE TABLE users (
+	id uuid PRIMARY KEY,
+	username text,
+	email text,
+	street_address text,
+	town text,
+);
+
+CREATE TABLE user_street (
+	town text,
+	street text,
+	user_id uuid,
+	PRIMARY KEY ((town, street), user_id)
+);
+									</pre>
+								</td>
+							</tr>
+						</table>
+					</section>
+					<section>
+						<h2><span class="ING">Native Protocol / DataStax Drivers</span></h2>
+						<br>
+						<p>CQL3 Only</p>
+						<p>Fully asynchronous protocol, using Netty</p>
+						<p>Server notifications</p>
+						<p>Optional compression</p>
+						<br>
+						<p>Java, C#, and Python so far, more will be added</p>
+						<p>Many policies, including TokenAwarePolicy, DowngradeConsistencyRetryPolicy, LoadBalancingPolicy, DCAwareRoundRobinPolicy etc</p>
+						<pre><span class="ING">
+                                        Maven:
+                                    
+                                        &lt;dependency&gt;
+                                            &lt;groupId&gt;com.datastax.cassandra&lt;/groupId&gt;
+                                            &lt;artifactId&gt;cassandra-driver-core&lt;/artifactId&gt;
+                                            &lt;version&gt;2.0.1&lt;/version&gt;
+                                        &lt;/dependency&gt;
+						</span></pre>
 					</section>
 				</section>
 
 				<section>
-					<h2>Spectacular image!</h2>
-					<a class="image" href="http://lab.hakim.se/meny/" target="_blank">
-						<img width="320" height="299" src="http://s3.amazonaws.com/hakim-static/portfolio/images/meny.png" alt="Meny">
-					</a>
+					<h2><span class="ING">Cassandra Meetup</span></h2>
+					<em>You're Invited:</em>
+					<p><a href="http://www.meetup.com/Netherlands-Cassandra-Users/events/168625032/"><span class="ING">http://www.meetup.com/Netherlands-Cassandra-Users/events/168625032/</span></a>
+					<br>
+					<img width=50% src="./images/meetup.png" style="background-color:white;"></img>
+					<p>First meetup held at 26-02-2014</p>
+					<p>Next meetup scheduled for 02-04-2014</p>
+					<p>Speakers: <span class="ING">Patrick McFadin (Datastax)</span> and <span class="ING">Gary Stewart (ING)</span></p>
 				</section>
-
+													
 				<section>
-					<h2>Export to PDF</h2>
-					<p>Presentations can be <a href="https://github.com/hakimel/reveal.js#pdf-export">exported to PDF</a>, below is an example that's been uploaded to SlideShare.</p>
-					<iframe id="slideshare" src="http://www.slideshare.net/slideshow/embed_code/13872948" width="455" height="356" style="margin:0;overflow:hidden;border:1px solid #CCC;border-width:1px 1px 0;margin-bottom:5px" allowfullscreen> </iframe>
-					<script>
-						document.getElementById('slideshare').attributeName = 'allowfullscreen';
-					</script>
+					<p>Thank you</p>
+					<em>...graceful bow</em>
+					<br><br><br>
+					Contact<br>	
+					<a href="mailto:christopher.reedijk@ing.nl"><span class="ING">christopher.reedijk@ing.nl</span></a><br>
+					<a href="mailto:gary.stewart@ing.nl"><span class="ING">gary.stewart@ing.nl</span></a><br><br>
+					<!--<em>We're hiring!</em><br>-->
+					<img src="./images/ing-logo.gif" alt="ING">
 				</section>
-
-				<section>
-					<h2>Take a Moment</h2>
-					<p>
-						Press b or period on your keyboard to enter the 'paused' mode. This mode is helpful when you want to take distracting slides off the screen
-						during a presentation.
-					</p>
-				</section>
-
-				<section>
-					<h2>Stellar Links</h2>
-					<ul>
-						<li><a href="http://slid.es">Try the online editor</a></li>
-						<li><a href="https://github.com/hakimel/reveal.js">Source code on GitHub</a></li>
-						<li><a href="http://twitter.com/hakimel">Follow me on Twitter</a></li>
-					</ul>
-				</section>
-
-				<section>
-					<h1>THE END</h1>
-					<h3>BY Hakim El Hattab / hakim.se</h3>
-				</section>
-
-			</div>
-
+				
+			</div>					
 		</div>
-
 		<script src="lib/js/head.min.js"></script>
-		<script src="js/reveal.min.js"></script>
-
+        <script src="js/reveal.min.js"></script>
 		<script>
+				// Full list of configuration options available here:
+				// https://github.com/hakimel/reveal.js#configuration
+				Reveal.initialize({
+						controls: true,
+						progress: true,
+						history: true,
+						center: true,
 
-			// Full list of configuration options available here:
-			// https://github.com/hakimel/reveal.js#configuration
-			Reveal.initialize({
-				controls: true,
-				progress: true,
-				history: true,
-				center: true,
+						theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+						transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
 
-				theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
-				transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
+						// Parallax scrolling
+						// parallaxBackgroundImage: 'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg',
+						// parallaxBackgroundSize: '2100px 900px',
 
-				// Parallax scrolling
-				// parallaxBackgroundImage: 'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg',
-				// parallaxBackgroundSize: '2100px 900px',
-
-				// Optional libraries used to extend on reveal.js
-				dependencies: [
-					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
-					{ src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
-					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
-					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
-					{ src: 'plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
-					{ src: 'plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
-				]
-			});
-
+						// Optional libraries used to extend on reveal.js
+						dependencies: [
+								{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+								{ src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+								{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+								{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+								{ src: 'plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+								{ src: 'plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+						]
+				});
+				Reveal.configure({ slideNumber: true });
 		</script>
-
 	</body>
 </html>

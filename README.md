@@ -1,4 +1,4 @@
-cassandra-meetup
+cassandra-training
 ================
 
-C* meetup presentations
+C* training presentations
