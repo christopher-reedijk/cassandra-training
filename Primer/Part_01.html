@@ -1,0 +1,724 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>C* Primer: Part 01 - Cassandra and Modelling Basics</title>
+
+		<meta name="description" content="A presentation to give insight into the basics of C* and data modelling">
+		<meta name="author" content="Christopher Reedijk | Gary Stewart">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<link rel="stylesheet" href="css/reveal.min.css">
+		<link rel="stylesheet" href="css/theme/night.css" id="theme">
+		
+		<!-- For syntax highlighting -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- If the query includes 'print-pdf', use the PDF print sheet -->
+		<script>
+			if( window.location.search.match( /print-pdf/gi ) ) {
+				var link = document.createElement( 'link' );
+				link.rel = 'stylesheet';
+				link.type = 'text/css';
+				link.href = 'css/print/pdf.css';
+				document.getElementsByTagName( 'head' )[0].appendChild( link );
+			}
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+		<style type="text/css">
+        .ING {
+        	color: #ff6600;
+        }
+        .ING_DARK_BLUE {
+        	color: #000066;
+        }
+        .ING_LIGHT_BLUE {
+        	color: #B4C3E1;
+        }
+        .ING_GREY {
+        	color: #969696;
+        }
+        .ING_DARK_GREY {
+        	color: #5F5F5F;
+        }
+    </style>
+    <link rel="shortcut icon" href="./images/ing_nl_favicon.ico">
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+				<section>				
+					<section>
+						<h1><scan class="ING">C* Primer</scan></h1>					
+						<h3>Part 01: Cassandra and Modeling Basics</h3>
+						<p>
+							<!--<small>Created by Christopher Reedijk (<a href="http://twitter.com/creedijk"><span class="ING">@creedijk</span></a>) and Gary Stewart (<a href="http://twitter.com/Gaz_GandA"><span class="ING">@Gaz_GandA</span></a>)<br>Dev Engineers, ING Netherlands</small><br>-->
+							<pre>
+	SELECT * FROM presenters WHERE name IN ('Christopher Reedijk', 'Gary Stewart');
+	 name                | title        | company | area | twitter    
+	---------------------+--------------+---------+------+----------- 
+	 Christopher Reedijk | Dev Engineer | ING     | NL   | <a href="http://twitter.com/creedijk"><span class="ING">@creedijk</span></a>
+	 Gary Stewart        | Dev Engineer | ING     | NL   | <a href="http://twitter.com/Gaz_GandA"><span class="ING">@Gaz_GandA</span></a>
+	 						</pre>
+							<br><img width=10% src="./images/ing_nl.jpg" alt="ING">
+							<br><small>ING Nederland (<a href="http://twitter.com/@ingnl"><span class="ING">@ingnl</span></a>)</small>
+							<br><br><br><small>This presentation is based on a 101 presentation by<br>Hayato Shimizu (<a href="https://twitter.com/hayato_shimizu"><span class="ING">@hayato_shimizu</span></a>)</small>
+						</p>
+					</section>				
+					<section>
+						<p><span class="ING">Short introduction</span></p>
+						<table width=100%>
+							<tr>
+								<td style="margin-left:auto;margin-right:auto" width=50%><img width="320" height="320" src="./images/chris.jpg" alt="Chris"></td>
+								<td style="margin-left:auto;margin-right:auto" width=50%><img width="320" height="320" src="./images/gary.jpg" alt="Gary"></td>
+							</tr>
+							<tr>
+								<td width=50%>Christopher Reedijk</td>
+								<td width=50%>Gary Stewart</td>
+							</tr>
+							<tr>
+								<td width=50%>
+									<ul>
+										<li class="ING">Dev Engineer</li>
+										<li class="ING">C* enthusiast</li>
+										<li class="ING">@ING since: 01-01-2011</li>
+										<li class="ING">AKA Grumpy</li>
+									</ul>
+								</td>
+								<td width=50%>
+									<ul>
+										<li class="ING">Dev Engineer</li>
+										<li class="ING">Love/hate relationship with C* :)</li>
+										<li class="ING">@ING since: 01-01-2012</li>
+										<li class="ING">AKA Legacy</li>
+									</ul>
+								</td>
+							</tr>
+						</table>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2><span class="ING">Apache Cassandra</span></h2>
+						<br>
+						<p>Created by Avinash Lakshman and Prashant Malik at Facebook</p>
+						<br>
+						<table width=100%>
+							<tr>
+								<th class="ING" width=45%>Cassandra is</th>
+								<th class="ING" width=10%></th>
+								<th class="ING" width=45%>Cassandra is not</th>
+							</tr>
+							<tr>
+								<td width=50% style="vertical-align:top">
+									<ul>
+										<li>A distributed database</li>
+										<li>Highly scalable</li>
+										<li>Fault tolerant</li>
+										<li>Consistency is tunable</li>
+										<li>High throughput</li>
+										<li>Network topology aware</li>
+										<li>Multi-DC Active-Active</li>
+										<li>Written in Java</li>
+										<li>A column family</li>
+										<li>CQL3</li>
+									</ul>
+								</td>
+								<td width=10%>&nbsp;</td>
+								<td width=50% style="vertical-align:top">
+									<ul>
+										<li>ACID compliant database</li>
+										<li>A relational database</li>
+										<li>ANSI SQL compliant</li>
+										<li>A document database</li>
+									</ul>
+								</td>
+							</tr>
+						</table>
+					</section>
+				</section>
+				<section>
+					<h2><span class="ING">DataStax and Cassandra</span></h2>
+					<img width=25% src="./images/cassandra.png" alt="Cassandra" style="background-color:white;">
+					<p>Founded in 2010 by Jonathan Ellis and Matt Pfeil</p>
+					<p>80% Apache Cassandra code contribution</p>
+					<p>Offer commercial support for DataStax Enterprise version of Cassandra</p>
+					<p>DataStax Enterprise integrates Search and Analytics</p>
+					<p>Head Quarter in San Francisco Bay area</p>
+					<p>EMEA office opened in March 2013</p>
+				</section>	
+				<section>
+					<section>
+						<h1><span class="ING">Cassandra Basics</span></h1>
+					</section>
+					<section>
+						<h2><span class="ING">Network Topology Awareness</span></h2>
+						<table>
+							<tr>
+								<td rowspan="2" width=80% style="vertical-align:middle">
+									<img width=100% src="./images/network_topology_awareness.png" alt="Network Topology Awareness" style="background-color:white;"></img>
+								</td>
+							</tr>
+							<tr>
+								<td width=20% style="vertical-align:top">
+									<u>Writes</u><br>
+									<ul>
+										<small><li>Any</li>
+										<li>One</li>
+										<li>Two</li>
+										<li>Three</li>
+										<li>Quorum</li>
+										<li>Local_Quorum</li>
+										<li>Each_Quorum</li>
+										<li>All</li></small>
+									</ul>
+								</td>
+								<td width=20% style="vertical-align:top">
+									<u>Reads</u><br>
+									<ul>
+										<small><li>One</li>
+										<li>Two</li>
+										<li>Three</li>
+										<li>Quorum</li>
+										<li>Local_Quorum</li>
+										<li>Each_Quorum</li>
+										<li>All</li></small>
+									</ul>
+								</td>
+							</tr>
+						</table>
+					</section>
+					<section>
+						<h2><span class="ING">Cassandra Replication Strategy</span></h2>
+						<table>
+							<tr>
+								<td width=60% style="vertical-align:middle">
+									<p>Token Range 0 -> 2<small>127</small>-1 in Ring Formation</p>
+									<p>Consistent Hashing Algorithm</p>
+									<p>Replica nodes in clockwise</p>
+									<p>Gossip protocol between nodes</p>
+								</td>
+								<td width=40% style="vertical-align:middle">
+									<img width=100% src="./images/cassandra_replication_strategy.png" alt="Cassandra Replication Strategy" style="background-color:white;"></img>
+									<small>RF = 3</small>
+								</td>
+							</tr>
+						</table>
+					</section>
+					<section>
+						<h2><span class="ING">No Single Point of Failure</span></h2>
+						<table>
+							<tr>
+								<td width=50% style="vertical-align:middle">
+									<ul>
+										<li>Client Load Balances</li>
+										<li>Do not use a hardware LB</li>
+									</ul>
+								</td>
+								<td width=50% style="vertical-align:middle">
+									<img width=100% src="./images/no_spof.png" alt="No SPOF" style="background-color:white;"></img>
+								</td>
+							</tr>
+						</table>
+					</section>
+					<section>
+						<h2><span class="ING">Write Path</span></h2>
+						<img width=100% src="./images/write_path.png" alt="Write Path" style="background-color:white;"></img>
+					</section>
+					<section>
+						<h2><span class="ING">Read Path</span></h2>
+						<img width=100% src="./images/read_path.png" alt="Read Path" style="background-color:white;"></img>
+					</section>
+					<section>
+						<h2><span class="ING">Logical Grouping</span></h2>
+						<img width=70% src="./images/logical_grouping.png" alt="Logical Grouping" style="background-color:white;"></img>
+					</section>
+					<section>
+						<h2><span class="ING">Replication Factor and Data Consistency In a Distributed System</span></h2>
+						<p>CAP – Consistency, Availability, Partition Tolerance</p>
+						<p>Consistency is achieved with W + R > RF</p>
+						<p>Quorum = (Integer) RF / 2 + 1</p>
+						<img width=90% src="./images/quorum.png" style="background-color:white;"></img>
+					</section>
+				</section>			
+				<section>
+					<section>
+						<h1><span class="ING">CQL3</span></h1>	
+					</section>
+					<section>
+						<h2><span class="ING">Why CQL3?</span></h2>
+						<p>Excellent language for modeling data structures</p>
+						<p>Usability</p>
+						<p>Readability</p>
+						<p>Familiarity</p>
+						<p>Programming language agnostic</p>
+					</section>
+					<section>
+						<h2><span class="ING">Apache Thrift, Hector, Astyanax days</span></h2>
+						<table>
+							<tr>
+								<td width=50% style="vertical-align:middle">
+									<pre>
+Column col = new Column(ByteBuffer.wrap("product".getBytes())));
+col.setValue(ByteBuffer.wrap("phone".getBytes());
+col.setTimestamp(System.currentTimeMillis());
+
+ColumnOrSuperColumn c = new ColumnOrSuperColumn();
+c.setColumn(col);
+
+Mutation m = new Mutation();
+m.setColumn_or_supercolumn(c);
+
+List<Mutations> ms = new ArrayList<Mutation>();
+ms.add(m);
+
+Map<String, List<Mutations>> cf = new HashMap<String, List<Mutations>>();
+cf.put("products", m);
+
+Map<ByteBuffer, Map<String, List<Mutation>>> records = new HashMap<ByteBuffer, Map<String, List<Mutation>>>();
+records.put(ByteBuffer.wrap("key".getBytes()), cf);
+client.batch_mutate(records, consistencyLevel);
+									</pre>
+								</td>
+								<td width=50% style="vertical-align:middle">
+									<img width=100% src="./images/stress.png" style="background-color:white;"></img>
+								</td>
+							</tr>
+						</table>
+					</section>
+					<section>
+						<h2><span class="ING">CQL3</span></h2>
+						<br>
+						<pre>
+INSERT INTO products (product_id, product) VALUES (“id12321”, “phone”);
+						</pre>
+						<img width=60% src="./images/easy.png" style="background-color:white;"></img>
+					</section>
+					<section>
+						<h2><span class="ING">CQL Basics – Primary Key</span></h2>
+						<br>
+						<div style="color:#ffffff">
+							<div align="left"><p><span style="color:#ff1493">The Primary Key</span></p></div>
+							<ul>
+								<li>The key uniquely identifies a row</li>
+								<li>A composite primary key consists of:</li>
+								<ul>
+									<li>A <span style="color:#7cfc00">partition key</span></li>
+									<li>One or more <span style="color:#E4F173">clustering columns</span><br>
+											e.g. <span style="color:#ff1493">PRIMARY KEY</span> (<span style="color:#7cfc00">partition key</span>, <span style="color:#E4F173">cluster columns</span>, ...)</li>
+								</ul>
+								<li>The <span style="color:#7cfc00">partition key</span> determines on which node the partition resides</li>
+								<li>Data is ordered in <span style="color:#E4F173">cluster column</span> order within the partition</li>
+							</ul>
+						</div>
+					</section>
+					<section>
+						<h2><span class="ING">CQL Basics – creating a table</span></h2>
+						<br>
+						<table>
+							<tr>
+								<td width=35% style="vertical-align:top">
+									<pre>
+CREATE TABLE cities (
+    city_name   varchar,
+    elevation   int,
+    population  int,
+    latitude    float,
+    longitude   float,
+    PRIMARY KEY (city_name)
+);
+									</pre>
+								</td>
+								<td width=65% style="vertical-align:top">
+									<p>We can visualize it this way:</p>
+									<img width=100% src="./images/simple_table.png" style="background-color:white;"></img>
+									<p>city_name is the partition key</p>
+									<p>In this example, the partition key = primary key</p>
+								</td>
+							</tr>
+						</table>
+					</section>
+					<section>
+						<h2><span class="ING">CQL Basics – clustering columns with primary key</span></h2>
+						<br>
+						<table>
+							<tr>
+								<td width=45% style="vertical-align:top">
+									<pre>
+CREATE TABLE sporty_league (
+   team_name   varchar,
+   player_name varchar,
+   jersey      int,
+   PRIMARY KEY (team_name, player_name)
+);
+									</pre>
+								</td>
+								<td width=55% style="vertical-align:top">
+									<img width=100% src="./images/composite_table.png" style="background-color:white;"></img>
+								</td>
+							</tr>
+						</table>
+					</section>
+					<section>
+						<h2><span class="ING">CQL Basics – composite<br>partition key</span></h2>
+						<br>
+						<table>
+							<tr>
+								<td width=40% style="vertical-align:top">
+									<pre>
+CREATE TABLE cities (
+  city_name   varchar,
+  state varchar, 
+  elevation float, 
+  latitude float, 
+  longitude float
+  population float,
+  PRIMARY KEY ((city_name,state))
+);
+									</pre>
+								</td>
+								<td width=60% style="vertical-align:top">
+									<img width=100% src="./images/composite_partition_key.png" style="background-color:white;"></img>
+									<p>Each city gets it own partition!</p>
+								</td>
+							</tr>
+						</table>
+					</section>
+					<section>
+						<h2><span class="ING">CQL Basics – Simple Select</span></h2>
+						<pre>
+
+ SELECT * FROM sporty_league;
+						</pre>
+						<table width=100%>
+							<tr>
+								<td width=50% style="vertical-align:middle">
+									<img width=100% src="./images/simple_select.png" style="background-color:white;"></img>
+								</td>
+								<td width=50% style="vertical-align:middle">
+									<img width=100% src="./images/composite_table.png" style="background-color:white;"></img>
+								</td>
+							</tr>
+						</table>
+						<br><br>
+						<p>More than a few rows can be slow. (Limited to 10,000 rows by default)</p>
+						<p>Use LIMIT keyword to choose fewer or more rows</p>
+					</section>
+					<section>
+						<h2><span class="ING">CQL Basics - Simple Select on Partition Key and Cluster Columns</span></h2>
+						<pre>
+ SELECT * FROM sporty_league WHERE team_name = 'Mighty Mutts';						</pre>
+						<img width=60% src="./images/simple_select_cc1.png" style="background-color:white;"></img>
+						<pre>
+ SELECT * FROM sporty_league WHERE team_name = 'Mighty Mutts'
+ and player_name = 'Lucky';
+						</pre>
+						<img width=60% src="./images/simple_select_cc2.png" style="background-color:white;"></img>
+					</section>
+					<section>
+						<h2><span class="ING">CQL Basics – Insert/Update</span></h2>
+						<pre>
+
+INSERT INTO sporty_league (team_name, player_name, jersey)
+VALUES ('Mighty Mutts','Felix',90);
+						</pre>
+					</section>
+					<section>
+						<h2><span class="ING">CQL Basics - Ordering</span></h2>
+						<br>
+						<table>
+							<tr>
+								<td width=40% style="vertical-align:top">
+									<pre>
+SELECT * FROM sporty_league
+WHERE team_name = 'Mighty Mutts'
+ORDER BY player_name DESC;
+
+CREATE TABLE sporty_league (
+   team_name   varchar,
+   player_name varchar,
+   jersey      int,
+   PRIMARY KEY (team_name, player_name)
+WITH CLUSTERING ORDER BY (player_name DESC);
+									</pre>
+								</td>
+								<td width=60% style="vertical-align:top">
+									<p>Partition keys are not ordered, but the cluster columns are</p>
+									<p>You can only order by a column if it's a cluster column</p>
+									<p>Data will by default be in the order of the clustering column(s) and ordered ASCending</p>
+									<p>You can also use the ORDER BY keyword – but only on the clustering column(s), which don't have clustering order by defined!</p>
+								</td>
+							</tr>
+						</table>
+					</section>
+					<section>
+						<h2><span class="ING">CQL Basics - Time to Live (TTL)</span></h2>
+						<pre>
+
+INSERT INTO users (id, first, last)
+VALUES ('abc123', 'abe', 'lincoln')
+USING TTL 3600; // Expires data in one hour
+						</pre>
+					</section>
+					<section>
+						<h2><span class="ING">CQL Basics – Collections</span></h2>
+						<br>
+						<div align="left"><p>CQL supports having columns that contain collections of data</p>
+										<pre>
+The collection types include:           CREATE TABLE collections_example (
+Set, List and Map                           id int PRIMARY KEY,
+                                            set_example set&lt;text&gt;,
+(64K max limitation)                        list_example list&lt;text&gt;,
+                                            map_example map&lt;int, text&gt;
+                                        );
+										</pre>
+							<p>These data types are intended to support the type of 1-to-many relationships that can be modeled in a relational DB e.g. a user has many email addresses</p><br>
+							<p>Some performance considerations around collections</p>
+						</div>
+						<ul>
+							<li>Often more efficient to denormalise further rather than use collections if intending to store lots of data.</li>
+							<li>Favour sets over list – lists not very performant</li>
+						</ul>
+					</section>
+					<section>
+						<h2><span class="ING">CQL Basics – Data Types</span></h2>
+						<img width=50% src="./images/data_types.png" style="background-color:white;"></img>
+					</section>
+					<section>
+						<h2><span class="ING">CQL Basics – Performance<br>considerations</span></h2>
+						<br>
+						<p>The best queries are in a single partition.</p>
+						<small>i.e. WHERE partition key = &lt;something&gt;</small>
+						<p>Queries that span multiple partitions are <span style="color:red">s-l-o-w</span></p>
+						<p>Queries that span multiple cluster columns are <span style="color:green">fast</span></p>
+					</section>
+					<section>
+						<h2><span class="ING">CQL Basics - Tracing</span></h2>
+						<br>
+						<p>You can turn on tracing on or off for queries with the TRACING ON | OFF command</p>
+						<p>This can help you understand what Cassandra is doing and identify any performance problems</p>
+						<img width=100% src="./images/tracing.png" style="background-color:white;"></img>
+						<p><a href="http://www.datastax.com/dev/blog/tracing-in-cassandra-1-2">http://www.datastax.com/dev/blog/tracing-in-cassandra-1-2</a></p>
+					</section>
+					<section>
+						<h2><span class="ING">CQL Basics - Lightweight Transactions</span></h2>
+						<p>Introduced in Cassandra 2.0</p>
+						<p>Example:</p>
+						<pre>
+INSERT INTO customer_account (customerID, customer_email)
+VALUES ('LauraS', 'lauras@gmail.com')
+IF NOT EXISTS;
+
+UPDATE customer_account SET customer_email='laurass@gmail.com'
+IF customer_email='lauras@gmail.com';
+						</pre>
+						<p>Great for 1% of your application – but not recommended to be used too much!</p>
+					</section>
+					<!--<section>
+						<h2><span class="ING">Lightweight Transactions - Paxos based</span></h2>
+						<br>
+						<table>
+							<tr>
+								<td width=60% style="vertical-align:top">
+									<ul>
+										<li>All operations are quorum-based</li>
+										<li>An elected leader prepares the participating replicas a ballot</li>
+										<li>Replicas would reply with the promise</li>
+										<li>Each replica sends information about unfinished operations to the leader during prepare</li>
+										<li>Paxos Made Simple</li>
+										<li>Paxos Made Live – An Engineering Perspective</li>
+									</ul>
+								</td>
+								<td width=40% style="vertical-align:top">
+									<img width=60% src="./images/paxos.png" style="background-color:white;"></img>
+								</td>
+							</tr>
+						</table>
+					</section>-->
+				</section>
+				<section>
+					<section>
+						<h1><span class="ING">Data Modeling</span></h1>	
+					</section>
+					<section>
+						<h2><span class="ING">Time Series</span></h2>
+						<br>
+						<table width=100%>
+							<tr>
+								<td width=55% style="vertical-align:top">
+									<pre class="fragment">
+CREATE TABLE sensor_data (
+  sensor_id int,
+  date varchar,
+  time timeuuid,
+  value int,
+  PRIMARY KEY( (sensor_id, date), time ) )
+WITH CLUSTERING ORDER BY (time DESC); 
+									</pre>
+								</td>
+								<td width=45% style="vertical-align:top">
+									<pre class="fragment">
+INSERT INTO sensor_data
+(sensor_id, date, time, value)
+VALUES (
+  1, '20130908',
+  1883-11e3-8ffd-0800200c9a66,
+  432)
+USING TTL 604800;
+									</pre>
+								</td>
+							</tr>
+							<tr>
+								<td colspan="2" style="vertical-align:top; margin-left:auto; margin-right:auto">
+									<pre class="fragment">
+SELECT time, value, TTL (value) FROM sensor_data
+  WHERE sensor_id = 1 AND date = '20130908'
+  AND time &gt; maxTimeuuid('2013-09-08 10:05+0000')
+  AND time &lt; minTimeuuid('2013-09-08 15:00+0000');
+									</pre>
+								</td>
+							</tr>
+							<tr>
+								<td colspan="2" style="vertical-align:top; margin-left:auto; margin-right:auto">
+									<pre class="fragment">
+ time                        | value | ttl(value)
+-----------------------------+-------+------------
+ 1883-11e3-8ffd-0800200c9a66 |   432 |     604257
+ 1887-11e3-8ffd-0800200c9a66 |   433 |     604452
+									</pre>
+								</td>
+							</tr>
+						</table>
+					</section>
+					<section>
+						<h2><span class="ING">De-normalize</span></h2>
+						<br>
+						<table width=100%>
+							<tr>
+								<th class="ING">Don't do this</th>
+								<th class="ING"></th>
+								<th class="fragment"><span class="ING">Do this instead</span></th>
+							</tr>
+							<tr>
+								<td width=45% style="vertical-align:top">
+									<pre>
+CREATE TABLE users (
+	id uuid PRIMARY KEY,
+	username text,
+	email text,
+	street_address text,
+	town text,
+);
+
+CREATE INDEX user_street ON users (street_address);
+CREATE INDEX user_town ON users (town);
+
+SELECT * FROM users WHERE
+	town = 'Stockholm' AND
+	street_address = 'Sankt Eriksgatan'
+	ALLOW FILTERING; 
+									</pre>
+								</td>
+								<td width=10% style="vertical-align:top">&nbsp;</td>
+								<td width=45% style="vertical-align:top">
+									<pre class="fragment">
+CREATE TABLE users (
+	id uuid PRIMARY KEY,
+	username text,
+	email text,
+	street_address text,
+	town text,
+);
+
+CREATE TABLE user_street (
+	town text,
+	street text,
+	user_id uuid,
+	PRIMARY KEY ((town, street), user_id)
+);
+									</pre>
+								</td>
+							</tr>
+						</table>
+					</section>
+					<section>
+						<h2><span class="ING">Native Protocol / DataStax Drivers</span></h2>
+						<br>
+						<p>CQL3 Only</p>
+						<p>Fully asynchronous protocol, using Netty</p>
+						<p>Server notifications</p>
+						<br>
+						<p>Java, C#, Python, node.js and Ruby so far, more will be added</p>
+						<p>Many policies, including TokenAwarePolicy, DowngradeConsistencyRetryPolicy, etc...</p>
+						<p>Metrics (<a href="http://metrics.codahale.com/"><span class="ING">metrics.codahale.com</span></a>) included</p>
+						<pre><span class="ING">
+                                        Maven:
+                                    
+                                        &lt;dependency&gt;
+                                            &lt;groupId&gt;com.datastax.cassandra&lt;/groupId&gt;
+                                            &lt;artifactId&gt;cassandra-driver-core&lt;/artifactId&gt;
+                                            &lt;version&gt;2.0.1&lt;/version&gt;
+                                        &lt;/dependency&gt;
+						</span></pre>
+					</section>
+				</section>
+													
+				<section>
+					<p>Thank you</p>
+					<em>...graceful bow</em>
+					<br><br><br>
+					Contact<br>	
+					<a href="mailto:christopher.reedijk@ing.nl"><span class="ING">christopher.reedijk@ing.nl</span></a><br>
+					<a href="mailto:gary.stewart@ing.nl"><span class="ING">gary.stewart@ing.nl</span></a><br><br>
+					<!--<em>We're hiring!</em><br>-->
+					<img src="./images/ing-logo.gif" alt="ING">
+				</section>
+				
+			</div>					
+		</div>
+		<script src="lib/js/head.min.js"></script>
+        <script src="js/reveal.min.js"></script>
+		<script>
+				// Full list of configuration options available here:
+				// https://github.com/hakimel/reveal.js#configuration
+				Reveal.initialize({
+						controls: true,
+						progress: true,
+						history: true,
+						center: true,
+
+						theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+						transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
+
+						// Parallax scrolling
+						// parallaxBackgroundImage: 'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg',
+						// parallaxBackgroundSize: '2100px 900px',
+
+						// Optional libraries used to extend on reveal.js
+						dependencies: [
+								{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+								{ src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+								{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+								{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+								{ src: 'plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+								{ src: 'plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+						]
+				});
+				Reveal.configure({ slideNumber: true });
+		</script>
+	</body>
+</html>
